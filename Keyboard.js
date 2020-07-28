@@ -145,7 +145,7 @@ const Keyboard = {
     },
 
     _defaultKeys() {
-        console.log('populating default keys');
+        // console.log('populating default keys');
         this.properties.keyboardType = 'default';
         let fragment = document.createDocumentFragment();
         let keyLayout = _DefaultKeyLayout();
@@ -154,7 +154,7 @@ const Keyboard = {
     },
 
     _customKeys(baseConsonant){
-        console.log('populating custom keys');
+        // console.log('populating custom keys');
         this.properties.keyboardType = 'custom';
         let fragment = document.createDocumentFragment();
         let keyLayout = _CompoundKeyLayout(baseConsonant);
@@ -180,9 +180,9 @@ const Keyboard = {
     },
 
     _renderKeyLayout(keyLayout, fragment){
-        console.log("renderKeyLayout");
-        console.log('keyLayout' + keyLayout);
-        console.log('fragment' + fragment);
+        // console.log("renderKeyLayout");
+        // console.log('keyLayout' + keyLayout);
+        // console.log('fragment' + fragment);
         var paras = document.getElementsByClassName('keyboard__key');
 
         // Creates HTML for an icon
@@ -270,33 +270,30 @@ const Keyboard = {
                     keyElement.textContent = key.toLowerCase();
 
                     keyElement.addEventListener("click", () => {
-                        //key = keys[_ORD(key)] ? String.fromCharCode(keys[_ORD(key)]) : key;
                         this.properties.value += this.properties.capsLock ? convertToCapital[_ORD(key)] ? String.fromCharCode(convertToCapital[_ORD(key)]) : key : key;
-                        // this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLowerCase();
                         this._triggerEvent("oninput");
                     });
 
                     break;
                     
                 default:
-                    console.log('keyboard Type: ' + this.properties.keyboardType)
+                    // console.log('keyboard Type: ' + this.properties.keyboardType)
                     key = keys[_ORD(key)] ? String.fromCharCode(keys[_ORD(key)]) : key;
                     keyElement.textContent = key.toLowerCase();
                     keyElement.addEventListener("click", () => {
-                        console.log('_ORD(key)' + _ORD(key));
-                        console.log('!amharicConsonants.includes(_ORD(key) ' + !amharicConsonants.includes(_ORD(key)));
+                        // console.log('_ORD(key)' + _ORD(key));
+                        // console.log('!amharicConsonants.includes(_ORD(key) ' + !amharicConsonants.includes(_ORD(key)));
                         if(!amharicConsonants.includes(_ORD(key)) || this.properties.keyboardType === 'custom'){ 
-                            console.log('custom keyboard entry')
+                            // console.log('custom keyboard entry')
                             this.properties.value += this.properties.capsLock ? convertToCapital[_ORD(key)] ? String.fromCharCode(convertToCapital[_ORD(key)]) : String.fromCharCode(_ORD(key)) : String.fromCharCode(_ORD(key));
                             this._triggerEvent("oninput");
                         }
-                        //key = keys[_ORD(key)] ? String.fromCharCode(keys[_ORD(key)]) : key;
-                    if(amharicConsonants.includes(_ORD(key)) || this.properties.keyboardType === 'custom'){
-                        console.log('clearing previous keyboard');
-                        this.elements.keysContainer.textContent = '';//clearing prevous keyboard
-                        this.elements.keysContainer.appendChild(keys[_ORD(key)] !== null && this.properties.keyboardType === 'default' ? this.properties.capsLock && convertToCapital[_ORD(key)]? this._customKeys(convertToCapital[_ORD(key)]) : this._customKeys(_ORD(key)): this._defaultKeys());
-                        this._addKeysToDOM();
-                        }
+                        if(amharicConsonants.includes(_ORD(key)) || this.properties.keyboardType === 'custom'){
+                            // console.log('clearing previous keyboard');
+                            this.elements.keysContainer.textContent = '';//clearing prevous keyboard
+                            this.elements.keysContainer.appendChild(keys[_ORD(key)] !== null && this.properties.keyboardType === 'default' ? this.properties.capsLock && convertToCapital[_ORD(key)]? this._customKeys(convertToCapital[_ORD(key)]) : this._customKeys(_ORD(key)): this._defaultKeys());
+                            this._addKeysToDOM();
+                            }
                         
                     });
 
@@ -323,14 +320,7 @@ const Keyboard = {
         this.properties.capsLock = !this.properties.capsLock;
         for (const key of this.elements.keys) {
             if (key.childElementCount === 0) {
-                if(_ORD(key.textContent) === 4925|| _ORD(key.textContent) ===  1345){
-                console.log(key.textContent);
-                console.log(_ORD(key.textContent))
-                console.log(convertToCapital[_ORD(key.textContent)]);
-                }
                 key.textContent = convertToCapital[_ORD(key.textContent)] ? String.fromCharCode(convertToCapital[_ORD(key.textContent)]) : key.textContent;
-
-                //key.textContent = this.properties.capsLock ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
             }
         }
     },
