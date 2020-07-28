@@ -41,6 +41,10 @@ var keys = Array();
     keys[117] = 4769;
     keys[121] = 4845;
 
+const amharicConsonants = [4613,4621 , 4629, 4637, 4645, 4653, 4661, 4669, 4677, 4709, 4717, 
+    4725, 4733, 4757, 4765, 4773, 4781, 4813, 4821, 4829, 4837, 4845, 4853, 4869, 4877, 4901,
+    4909, 4917, 4925, 4933, 4941, 4949];
+
 //retrieves a character's unicode value
 function _ORD(chr){
     return chr ? chr.charCodeAt(0) : "undefined" ;
@@ -135,8 +139,30 @@ const Keyboard = {
         // Setup main elements
         this.elements.main.classList.add("keyboard", "keyboard--hidden");
         this.elements.keysContainer.classList.add("keyboard__keys");
-        this.elements.keysContainer.appendChild(this._createKeys());
+        this.elements.keysContainer.appendChild(this._defaultKeys());
 
+        this._addKeysToDOM();
+    },
+
+    _defaultKeys() {
+        console.log('populating default keys');
+        this.properties.keyboardType = 'default';
+        let fragment = document.createDocumentFragment();
+        let keyLayout = _DefaultKeyLayout();
+        fragment = this._renderKeyLayout(keyLayout, fragment);
+        return fragment;
+    },
+
+    _customKeys(baseConsonant){
+        console.log('populating custom keys');
+        this.properties.keyboardType = 'custom';
+        let fragment = document.createDocumentFragment();
+        let keyLayout = _CompoundKeyLayout(baseConsonant);
+        fragment = this._renderKeyLayout(keyLayout, fragment);
+        return fragment;
+    },
+
+    _addKeysToDOM(){
         this.elements.keys = this.elements.keysContainer.querySelectorAll(".keyboard__key");
 
         // Add to DOM
@@ -153,14 +179,21 @@ const Keyboard = {
         });
     },
 
-    _createKeys() {
-        const fragment = document.createDocumentFragment();
-        let keyLayout = _DefaultKeyLayout();
+    _renderKeyLayout(keyLayout, fragment){
+        console.log("renderKeyLayout");
+        console.log('keyLayout' + keyLayout);
+        console.log('fragment' + fragment);
+        var paras = document.getElementsByClassName('keyboard__key');
 
         // Creates HTML for an icon
         const createIconHTML = (icon_name) => {
             return `<i class="material-icons">${icon_name}</i>`;
         };
+
+
+        while(paras[0]) {
+            paras[0].parentNode.removeChild(paras[0]);
+        }
 
         keyLayout.forEach(key => {
             const keyElement = document.createElement("button");
@@ -224,7 +257,8 @@ const Keyboard = {
                         this._triggerEvent("onclose");
                     });
 
-                    break;                
+                    break;    
+    
 
                 //vowels
                 case "a":
@@ -243,17 +277,27 @@ const Keyboard = {
                     });
 
                     break;
-
+                    
                 default:
-                    keyLayout = keys[_ORD(key)] ? _CompoundKeyLayout(keys[_ORD(key)]): _DefaultKeyLayout;
+                    console.log('keyboard Type: ' + this.properties.keyboardType)
                     key = keys[_ORD(key)] ? String.fromCharCode(keys[_ORD(key)]) : key;
                     keyElement.textContent = key.toLowerCase();
-
                     keyElement.addEventListener("click", () => {
+                        console.log('_ORD(key)' + _ORD(key));
+                        console.log('!amharicConsonants.includes(_ORD(key) ' + !amharicConsonants.includes(_ORD(key)));
+                        if(!amharicConsonants.includes(_ORD(key)) || this.properties.keyboardType === 'custom'){ 
+                            console.log('custom keyboard entry')
+                            this.properties.value += this.properties.capsLock ? convertToCapital[_ORD(key)] ? String.fromCharCode(convertToCapital[_ORD(key)]) : String.fromCharCode(_ORD(key)) : String.fromCharCode(_ORD(key));
+                            this._triggerEvent("oninput");
+                        }
                         //key = keys[_ORD(key)] ? String.fromCharCode(keys[_ORD(key)]) : key;
-                        this.properties.value += this.properties.capsLock ? convertToCapital[_ORD(key)] ? String.fromCharCode(convertToCapital[_ORD(key)]) : key : key;
-                        // this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLowerCase();
-                        this._triggerEvent("oninput");
+                    if(amharicConsonants.includes(_ORD(key)) || this.properties.keyboardType === 'custom'){
+                        console.log('clearing previous keyboard');
+                        this.elements.keysContainer.textContent = '';//clearing prevous keyboard
+                        this.elements.keysContainer.appendChild(keys[_ORD(key)] !== null && this.properties.keyboardType === 'default' ? this.properties.capsLock && convertToCapital[_ORD(key)]? this._customKeys(convertToCapital[_ORD(key)]) : this._customKeys(_ORD(key)): this._defaultKeys());
+                        this._addKeysToDOM();
+                        }
+                        
                     });
 
                     break;
